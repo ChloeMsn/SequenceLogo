@@ -6,8 +6,22 @@ import sys
 import numpy as np 
 import math 
 
+
+'''
+Function printing the hekp 
+
+'''
 def help() : 
-    print("HELP")
+    print("*****************************************************")
+    print("*" + "\t" + " HOW TO RUN sequence_logo.py "+"\t" + "            *")
+    print("*****************************************************")
+    print('\n')
+
+    print("\t" + "The script must be launched with at least one argument." + '\n' + '\t'+ "A file containing aligned sequences must be given" + '\n')
+    print("Example : ./sequence_logo.py exemple.txt")
+    print('\n')
+
+
 
 
 
@@ -16,6 +30,7 @@ Read the file, count number of sequences and read the alphabet
 
 Input : 
     file containing the sequences, each sequence is written on one line 
+
 Output : 
     list containing all the letters of the alphabet 
     int equals to the number of sequences 
@@ -97,27 +112,57 @@ def freqMatrix(matrice, count_seq) :
     for j in range(len(matrice[0])) : 
     #parcours par ligne             
         for i in range(len(matrice)) : 
+
+            #stock the number of apperances of a given letter in the column j 
             effectif = matrice[i][j]
+
+            #calculate frequency
             matrice[i][j] = round(effectif / count_seq, 2)
+
     return matrice
 
 
 
 """
 Function to print the matrix 
+
+Input : 
+    matrix to print
+    list containing all the letters of the alphabet 
+    int corresponding to the length of the alignement
+
+Output : 
+    No output
 """
 def affichage(matrice, alphabet, longueur_seq) : 
+
+    #to print the number of the columns 
     num_colonne = []
     for i in range(longueur_seq) : 
         num_colonne.append(i)
-    print("" + "\t" + str(num_colonne))
+    print("" + "\t" + str(num_colonne) +"\n")
+
+    #to print the value 
     for i in range(len(alphabet)) : 
         print(str(alphabet[i])+ "\t" + str(matrice[i]))
 
 
+"""
+Calculate the entropy os Shannon and a correction factor for each column
+
+Input : 
+    matrix containing the frequency of each letter of the alphabet for each column in the alignment
+    matrix containing the number of representations of each letter of the alphabet for each column in the alignment
+    list containing all the letters of the alphabet 
+
+Output : 
+    list containing the value of the entropy for each column
+
+"""
+
 def entropie(matrice_freq, matrice_comptage, alphabet) : 
 
-    
+    #create list of entropy 
     liste_R = []
      #parcours par colonne 
     for j in range(len(matrice_freq[0])) : 
@@ -128,24 +173,52 @@ def entropie(matrice_freq, matrice_comptage, alphabet) :
      
     #parcours par ligne             
         for i in range(len(matrice_freq)) :
-            #to assure that we dont count "-" as a symbol 
+
+            #to assure that we dont count "-" as a symbol if there is a "-" in the alignment  
             if "-" in alphabet and alphabet.index("-") != i : 
+
+                #if the letter appears in the column 
                 if matrice_freq[i][j] != 0 : 
+
+                    #increment number of symbols 
                     count_symbol += matrice_comptage[i][j]
+
+                    #calculate H for the current character 
                     H += matrice_freq[i][j] * math.log2(matrice_freq[i][j])
+
+        #size of the alphabet, as "-" is not counted as a symbol we have to retrieve 1 
         if "-" in alphabet : 
             alphabet_size = len(alphabet) -1 
         else : 
             alphabet_size = len(alphabet)
-        print("on a " + str(count_symbol))
+        
+        #calculate correction factor 
         e = (alphabet_size - 1) / (2*count_symbol*math.log(count_symbol))
+
+        #calculate R 
         R = math.log2(alphabet_size) - (H+e)
+
+        #update the list 
         liste_R.append(R)
 
     return liste_R
 
     
-        
+def size(matrice_freq, alphabet, liste_R) : 
+
+    matrice_size = M = [[0]*len(matrice_freq[0]) for i in range(len(alphabet))]
+
+    #parcours par colonne 
+    for j in range(len(matrice_freq[0])) : 
+
+        #parcours par ligne 
+        for i in range(len(matrice_freq)) : 
+
+            matrice_size[i][j] = matrice_freq[i][j]*liste_R[j]
+    
+    
+    return matrice_size
+
 
         
             
@@ -154,7 +227,11 @@ def entropie(matrice_freq, matrice_comptage, alphabet) :
 MAIN FUNCTION
 """
 def main(arg1) : 
+    print("\n")
+    print("######################################################################################")
     print("################################# DEBUT DU PROGRAMME #################################")
+    print("######################################################################################")
+    print("\n")
     alphabet, nb_seq, longueur_seq = readFile(arg1)
     print("Il y a " + str(nb_seq) + str( " séquences"))
     print("l'alphabet est : " + str(alphabet))
@@ -174,14 +251,23 @@ def main(arg1) :
     #print(M)
     liste_R = entropie(matrice_freq, M, alphabet)
     print(liste_R)
-    
+    print("\n")
 
+    taille = size(matrice_freq,alphabet,liste_R) 
+    print("Taille des lettres dans le graphe : ")
+    affichage(taille,alphabet,longueur_seq) 
+    print("\n")  
+
+    print("######################################################################################")
+    print("################################## FIN DU PROGRAMME ##################################")
+    print("######################################################################################")
+    print("\n")
 
 
 
 if __name__ == "__main__":
     if len(sys.argv) <= 1 : 
-        print("Missing arguments : use -h or --help")
+        print("Missing arguments : use -h or --help to get some informations")
     else : 
         if sys.argv[1] == "-h" or sys.argv[1] == "--help" : 
             help()
