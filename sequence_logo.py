@@ -4,7 +4,7 @@
 
 import sys 
 import numpy as np 
-
+import math 
 
 def help() : 
     print("HELP")
@@ -61,7 +61,7 @@ Output :
 def countMatrix(alphabet, fichier, longueur) :
 
     #create matrix where each line represents a letter in the alphabet and each columns represent a column in the alignment of sequences 
-    M = [[0.00]*longueur for i in range(len(alphabet))]
+    M = [[0]*longueur for i in range(len(alphabet))]
     with open(fichier) as file :  
 
         #for each sequence 
@@ -115,6 +115,38 @@ def affichage(matrice, alphabet, longueur_seq) :
         print(str(alphabet[i])+ "\t" + str(matrice[i]))
 
 
+def entropie(matrice_freq, matrice_comptage, alphabet) : 
+
+    
+    liste_R = []
+     #parcours par colonne 
+    for j in range(len(matrice_freq[0])) : 
+
+        #intialize entropy to 0 for each column 
+        H = 0 
+        count_symbol = 0 
+     
+    #parcours par ligne             
+        for i in range(len(matrice_freq)) :
+            #to assure that we dont count "-" as a symbol 
+            if "-" in alphabet and alphabet.index("-") != i : 
+                if matrice_freq[i][j] != 0 : 
+                    count_symbol += matrice_comptage[i][j]
+                    H += matrice_freq[i][j] * math.log2(matrice_freq[i][j])
+        if "-" in alphabet : 
+            alphabet_size = len(alphabet) -1 
+        else : 
+            alphabet_size = len(alphabet)
+        print("on a " + str(count_symbol))
+        e = (alphabet_size - 1) / (2*count_symbol*math.log(count_symbol))
+        R = math.log2(alphabet_size) - (H+e)
+        liste_R.append(R)
+
+    return liste_R
+
+    
+        
+
         
             
 
@@ -130,12 +162,19 @@ def main(arg1) :
 
     print("Matrice de comptage : ")
     matrice_comptage = countMatrix(alphabet, arg1, longueur_seq)
+    M = np.copy(matrice_comptage)
     affichage(matrice_comptage,alphabet,longueur_seq)
 
     print("\n" + "Matrice de fréquence : ")
     matrice_freq = freqMatrix(matrice_comptage, nb_seq)
     affichage(matrice_freq, alphabet, longueur_seq)
     print("\n")
+
+    print("Calcul de l'entropie : ")
+    #print(M)
+    liste_R = entropie(matrice_freq, M, alphabet)
+    print(liste_R)
+    
 
 
 
