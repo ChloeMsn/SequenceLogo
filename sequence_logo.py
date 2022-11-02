@@ -5,6 +5,7 @@
 import sys 
 import numpy as np 
 
+
 def help() : 
     print("HELP")
 
@@ -46,7 +47,7 @@ def readFile(fichier) :
 
 
 """
-Create a matrix containing the number of representations of each letter of the alphabet for each column of the alignment
+Create a matrix containing the number of representations of each letter of the alphabet for each column in the alignment
 
 Input : 
     list containing all the letters of the alphabet 
@@ -60,7 +61,7 @@ Output :
 def countMatrix(alphabet, fichier, longueur) :
 
     #create matrix where each line represents a letter in the alphabet and each columns represent a column in the alignment of sequences 
-    M = [[0]*longueur for i in range(len(alphabet))]
+    M = [[0.00]*longueur for i in range(len(alphabet))]
     with open(fichier) as file :  
 
         #for each sequence 
@@ -76,8 +77,20 @@ def countMatrix(alphabet, fichier, longueur) :
                     #the index of the line corresponds to the index of the index of the character in the list alphabet
                     indice_ligne = alphabet.index(char)
                     M[indice_ligne][indice_colonne] += 1
+    
     return M 
 
+"""
+Create a matrix containing the frequency of each letter of the alphabet for each column in the alignment
+
+Input : 
+    matrix containing the number of representations of each letter of the alphabet for each column in the alignment
+    int equals to the number of sequences 
+    NB : we're assuming that each sequence has the same length (and if there are gap, it is represented with the symbol "-")
+
+Output : 
+    matrix 
+"""
 
 def freqMatrix(matrice, count_seq) : 
     #parcours par colonne 
@@ -85,15 +98,13 @@ def freqMatrix(matrice, count_seq) :
     #parcours par ligne             
         for i in range(len(matrice)) : 
             effectif = matrice[i][j]
-            matrice[i][j] = effectif / count_seq
+            matrice[i][j] = round(effectif / count_seq, 2)
     return matrice
 
 
 
 """
 Function to print the matrix 
-
-
 """
 def affichage(matrice, alphabet, longueur_seq) : 
     num_colonne = []
@@ -111,15 +122,20 @@ def affichage(matrice, alphabet, longueur_seq) :
 MAIN FUNCTION
 """
 def main(arg1) : 
-
+    print("################################# DEBUT DU PROGRAMME #################################")
     alphabet, nb_seq, longueur_seq = readFile(arg1)
     print("Il y a " + str(nb_seq) + str( " séquences"))
     print("l'alphabet est : " + str(alphabet))
-    matrice_comptage = countMatrix(alphabet, arg1, longueur_seq)
-    matrice_freq = freqMatrix(matrice_comptage, nb_seq)
-    affichage(matrice_comptage,nb_seq)
-    #affichage(matrice_freq, alphabet, longueur_seq)
+    print("\n")
 
+    print("Matrice de comptage : ")
+    matrice_comptage = countMatrix(alphabet, arg1, longueur_seq)
+    affichage(matrice_comptage,alphabet,longueur_seq)
+
+    print("\n" + "Matrice de fréquence : ")
+    matrice_freq = freqMatrix(matrice_comptage, nb_seq)
+    affichage(matrice_freq, alphabet, longueur_seq)
+    print("\n")
 
 
 
