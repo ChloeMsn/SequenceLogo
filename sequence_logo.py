@@ -30,6 +30,7 @@ def readFile(fichier) :
 
         #for each sequence
         for line in file :  
+            length_sequence = len(line)
 
             #update the number of sequences 
             count_seq+=1 
@@ -38,10 +39,10 @@ def readFile(fichier) :
             for letter in line : 
 
                 #update the alphabet 
-                if letter not in alphabet : 
+                if letter not in alphabet and letter != "\n": 
                     alphabet.append(letter)
     
-    return alphabet, count_seq 
+    return alphabet, count_seq, length_sequence 
 
 
 """
@@ -52,11 +53,14 @@ Input :
     file containing the sequences 
     int equals to the length of the alignment 
     NB : we're assuming that each sequence has the same length (and if there are gap, it is represented with the symbol "-")
+
+Output : 
+    matrix 
 """
 def countMatrix(alphabet, fichier, longueur) :
 
     #create matrix where each line represents a letter in the alphabet and each columns represent a column in the alignment of sequences 
-    M = [[0]*longueur for i in range(alphabet)]
+    M = [[0]*longueur for i in range(len(alphabet))]
     with open(fichier) as file :  
 
         #for each sequence 
@@ -77,25 +81,46 @@ def countMatrix(alphabet, fichier, longueur) :
 
 def freqMatrix(matrice, count_seq) : 
     #parcours par colonne 
-    for j in len(matrice[0]) : 
+    for j in range(len(matrice[0])) : 
     #parcours par ligne             
-        for i in len(matrice) : 
+        for i in range(len(matrice)) : 
             effectif = matrice[i][j]
             matrice[i][j] = effectif / count_seq
+    return matrice
+
+
+
+"""
+Function to print the matrix 
+
+
+"""
+def affichage(matrice, alphabet, longueur_seq) : 
+    num_colonne = []
+    for i in range(longueur_seq) : 
+        num_colonne.append(i)
+    print("" + "\t" + str(num_colonne))
+    for i in range(len(alphabet)) : 
+        print(str(alphabet[i])+ "\t" + str(matrice[i]))
+
 
         
             
-            
 
-             
-
-    
-
-
-
+"""
+MAIN FUNCTION
+"""
 def main(arg1) : 
 
-    print("main")
+    alphabet, nb_seq, longueur_seq = readFile(arg1)
+    print("Il y a " + str(nb_seq) + str( " séquences"))
+    print("l'alphabet est : " + str(alphabet))
+    matrice_comptage = countMatrix(alphabet, arg1, longueur_seq)
+    matrice_freq = freqMatrix(matrice_comptage, nb_seq)
+    affichage(matrice_comptage,nb_seq)
+    #affichage(matrice_freq, alphabet, longueur_seq)
+
+
 
 
 
